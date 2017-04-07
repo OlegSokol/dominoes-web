@@ -17,5 +17,6 @@ public class Main {
         for (DominoTileChain allCombination : dominoTileChains ) {
             System.out.println(allCombination);
         }
+        System.out.println("Long" + dominoesServiceBFS.getLongestCombination(randomTiles));
     }
 }

@@ -16,9 +16,10 @@ public class DominoBox {
     private static DominoBox instance = null;
     
     private void init() {
+        int index = 1;
         for (int value1 = MIN_VALUE; value1 <= MAX_VALUE; value1++) {
             for (int value2 = MIN_VALUE; value2 <= value1; value2++) {
-                    DominoTile dominoTile = new DominoTile(value1, value2);
+                    DominoTile dominoTile = new DominoTile(value1, value2, index++);
                     dominoes.add(dominoTile);
             }
         }

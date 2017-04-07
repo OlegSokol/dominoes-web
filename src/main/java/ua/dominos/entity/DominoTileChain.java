@@ -41,23 +41,29 @@ public class DominoTileChain {
     }
 
     private Integer getValueLeft() {
-        if (!chain.isEmpty()) {
+        if (!chain.isEmpty())
             return chain.getFirst().getValueLeft();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     private Integer getValueRight() {
-        if (!chain.isEmpty()) {
+        if (!chain.isEmpty())
             return chain.getLast().getValueRight();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     public Integer length() {
         return chain.size();
+    }
+
+    private DominoTileChain copy() {
+        DominoTileChain result = new DominoTileChain();
+        result.chain.addAll(chain);
+        return result;
+    }
+
+    public LinkedList<DominoTile> getChain() {
+        return chain;
     }
 
     @Override
@@ -92,15 +98,5 @@ public class DominoTileChain {
             isAllTilesEqual &= other.chain.contains(tile);
         }
         return isAllTilesEqual && Objects.equals(this.length(), other.length());
-    }
-
-    private DominoTileChain copy() {
-        DominoTileChain result = new DominoTileChain();
-        result.chain.addAll(chain);
-        return result;
-    }
-
-    public LinkedList<DominoTile> getChain() {
-        return chain;
     }
 }

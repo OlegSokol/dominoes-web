@@ -1,7 +1,12 @@
 package ua.dominos.service;
 
+import ua.dominos.dao.DominoesDao;
+import ua.dominos.dao.impl.DominoesDaoImpl;
+import ua.dominos.dao.transaction.Transaction;
+import ua.dominos.dao.transaction.TransactionManager;
 import ua.dominos.entity.DominoTile;
 import ua.dominos.entity.DominoTileChain;
+import ua.dominos.exception.DominoesServiceException;
 
 import java.util.*;
 
@@ -9,9 +14,11 @@ import java.util.*;
  * Breadth first search algorithm implementation.
  */
 public class DominoesServiceBFS implements DominoesService {
+    private TransactionManager transactionManager = new TransactionManager();
+    private DominoesDao dominoesDao = new DominoesDaoImpl();
     private List<DominoTile> dominoes;
-    private Map<Integer, Set<DominoTileChain>> chains = new HashMap<>();
-    private LinkedList<DominoTileChain> allCombinations = new LinkedList<>();
+    private final Map<Integer, Set<DominoTileChain>> chains = new HashMap<>();
+    private final LinkedList<DominoTileChain> allCombinations = new LinkedList<>();
 
     @Override
     public List<DominoTileChain> getAllChainCombinations(List<DominoTile> dominoes) {
@@ -37,11 +44,26 @@ public class DominoesServiceBFS implements DominoesService {
         return this.allCombinations.getLast();
     }
 
+    @Override
+    public boolean saveChains(List<DominoTileChain> chains) throws DominoesServiceException {
+        return transactionManager.execute(() -> dominoesDao.saveChains(chains));
+    }
+
+    @Override
+    public List<DominoTileChain> getChainsHistory() throws DominoesServiceException {
+        return transactionManager.executeWithoutTransaction(() -> dominoesDao.getChainsHistory());
+    }
+
+    @Override
+    public List<DominoTile> getAllDominoesTile() throws DominoesServiceException {
+        return transactionManager.executeWithoutTransaction(() -> dominoesDao.getAllDominoesTile());
+    }
+
     private Set<DominoTileChain> findNextChains(DominoTileChain currentChain) {
         Set<DominoTileChain> nextChainSet = new HashSet<>();
-        for (DominoTile dominoe : dominoes) {
-            if (!currentChain.getChain().contains(dominoe)) {
-                DominoTileChain nextChain = currentChain.connect(dominoe);
+        for (DominoTile domino : dominoes) {
+            if (!currentChain.getChain().contains(domino)) {
+                DominoTileChain nextChain = currentChain.connect(domino);
                 if (nextChain.length() > currentChain.length()) {
                     nextChainSet.add(nextChain);
                 }
