@@ -33,8 +33,9 @@ public class DominoTile {
     }
 
     public DominoTile swap() {
-        isSwap = !isSwap;
-        return new DominoTile(valueRight, valueLeft, index);
+        DominoTile dominoTile = new DominoTile(valueRight, valueLeft, index);
+        dominoTile.setSwap(true);
+        return dominoTile;
     }
 
     public int getIndex() {
@@ -43,6 +44,10 @@ public class DominoTile {
 
     public boolean isSwap() {
         return isSwap;
+    }
+
+    public void setSwap(boolean swap) {
+        isSwap = swap;
     }
 
     @Override

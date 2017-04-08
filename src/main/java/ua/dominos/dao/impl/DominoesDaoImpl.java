@@ -18,31 +18,32 @@ public class DominoesDaoImpl implements DominoesDao {
     @Override
     public boolean saveChains(List<DominoTileChain> chains) {
         Connection connection = ConnectionPool.getConnection();
-        try {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_CHAINS, Statement.RETURN_GENERATED_KEYS)) {
             for (DominoTileChain chain : chains) {
-                int chainGeneratedId;
-                List<DominoTile> dominoChain = chain.getChain();
-                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_CHAINS, Statement.RETURN_GENERATED_KEYS)) {
-                    preparedStatement.setInt(1, chain.length());
-                    preparedStatement.executeUpdate();
-                    chainGeneratedId = getGeneratedId(preparedStatement);
-                }
-                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_DOMINOES_CHAINS)) {
-                    for (DominoTile dominoTile : dominoChain) {
-                        preparedStatement.setInt(1, chainGeneratedId);
-                        preparedStatement.setInt(2, dominoTile.getIndex());
-                        preparedStatement.setInt(3, dominoChain.indexOf(dominoTile) + 1);
-                        preparedStatement.setBoolean(4, dominoTile.isSwap());
-                        preparedStatement.addBatch();
-                    }
-                    preparedStatement.executeBatch();
-                }
+                List<DominoTile> dominoes = chain.getChain();
+                preparedStatement.setInt(1, chain.length());
+                preparedStatement.addBatch();
+                preparedStatement.executeUpdate();
+                int chainGeneratedId = getGeneratedId(preparedStatement);
+                saveDominoPositions(connection, chainGeneratedId, dominoes);
             }
         } catch (SQLException e) {
             LOG.warn("Can not save chains", e);
             return false;
         }
         return true;
+    }
+
+    private void saveDominoPositions(Connection connection, int chainGeneratedId, List<DominoTile> dominoes) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_DOMINOES_CHAINS)) {
+            for (DominoTile dominoTile : dominoes) {
+                preparedStatement.setInt(1, chainGeneratedId);
+                preparedStatement.setInt(2, dominoTile.getIndex());
+                preparedStatement.setBoolean(3, dominoTile.isSwap());
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+        }
     }
 
     @Override
@@ -52,24 +53,25 @@ public class DominoesDaoImpl implements DominoesDao {
             ResultSet resultSet = statement.executeQuery(SELECT_FROM_DOMINOES_CHAINS);
             return fromResultSetToDominoTileChainList(resultSet);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Can not get history of chains", e);
             return null;
         }
     }
 
     @Override
     public List<DominoTile> getAllDominoesTile() {
-        List<DominoTile> dominoTiles = new ArrayList<>();
         Connection connection = ConnectionPool.getConnection();
         try (Statement statement = connection.createStatement()) {
+            List<DominoTile> dominoTiles = new ArrayList<>();
             ResultSet resultSet = statement.executeQuery(SELECT_FROM_DOMINO_TILES);
             while (resultSet.next()) {
                 dominoTiles.add(fromResultSetToDominoTileConverter(resultSet));
             }
+            return dominoTiles;
         } catch (SQLException e) {
             LOG.warn("Can not get all dominoes", e);
+            return null;
         }
-        return dominoTiles;
     }
 
     private int getGeneratedId(Statement statement) throws SQLException {
@@ -111,7 +113,7 @@ public class DominoesDaoImpl implements DominoesDao {
         DominoTile domino = dominoBox.getByIndex(index);
         DominoTile newDomino = new DominoTile(domino.getValueLeft(), domino.getValueRight(), index);
         if (swap) {
-            newDomino.swap();
+           return newDomino.swap();
         }
         return newDomino;
     }
