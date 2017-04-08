@@ -41,8 +41,8 @@ public class DominoTile {
         return index;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public boolean isSwap() {
+        return isSwap;
     }
 
     @Override

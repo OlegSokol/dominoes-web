@@ -18,13 +18,31 @@ public class DominoesDaoImpl implements DominoesDao {
     @Override
     public boolean saveChains(List<DominoTileChain> chains) {
         Connection connection = ConnectionPool.getConnection();
-        try (PreparedStatement pStatement = connection.prepareStatement(INSERT_CHAIN)) {
-            //TODO: fill method
-            return true;
+        try {
+            for (DominoTileChain chain : chains) {
+                int chainGeneratedId;
+                List<DominoTile> dominoChain = chain.getChain();
+                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CHAIN, Statement.RETURN_GENERATED_KEYS)) {
+                    preparedStatement.setInt(1, chain.length());
+                    preparedStatement.executeUpdate();
+                    chainGeneratedId = getGeneratedId(preparedStatement);
+                }
+                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_DOMINOES_CHAINS)) {
+                    for (DominoTile dominoTile : dominoChain) {
+                        preparedStatement.setInt(1, chainGeneratedId);
+                        preparedStatement.setInt(2, dominoTile.getIndex());
+                        preparedStatement.setInt(3, dominoChain.indexOf(dominoTile) + 1);
+                        preparedStatement.setBoolean(4, dominoTile.isSwap());
+                        preparedStatement.addBatch();
+                    }
+                    preparedStatement.executeBatch();
+                }
+            }
         } catch (SQLException e) {
             LOG.warn("Can not save chains", e);
             return false;
         }
+        return true;
     }
 
     @Override
@@ -45,6 +63,15 @@ public class DominoesDaoImpl implements DominoesDao {
             LOG.warn("Can not get all dominoes", e);
         }
         return dominoTiles;
+    }
+
+    private int getGeneratedId(Statement statement) throws SQLException {
+        ResultSet generatedKeys = statement.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            return generatedKeys.getInt(1);
+        } else {
+            throw new SQLException("Creating chain failed, no ID obtained.");
+        }
     }
 
     private DominoTile fromResultSetToDominoTileConverter(ResultSet resultSet) throws SQLException {
