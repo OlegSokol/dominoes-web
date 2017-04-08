@@ -3,12 +3,12 @@ package ua.dominos.dao.impl;
 import org.apache.log4j.Logger;
 import ua.dominos.dao.ConnectionPool;
 import ua.dominos.dao.DominoesDao;
+import ua.dominos.entity.DominoBox;
 import ua.dominos.entity.DominoTile;
 import ua.dominos.entity.DominoTileChain;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static ua.dominos.dao.Query.*;
 
@@ -22,12 +22,12 @@ public class DominoesDaoImpl implements DominoesDao {
             for (DominoTileChain chain : chains) {
                 int chainGeneratedId;
                 List<DominoTile> dominoChain = chain.getChain();
-                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CHAIN, Statement.RETURN_GENERATED_KEYS)) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_CHAINS, Statement.RETURN_GENERATED_KEYS)) {
                     preparedStatement.setInt(1, chain.length());
                     preparedStatement.executeUpdate();
                     chainGeneratedId = getGeneratedId(preparedStatement);
                 }
-                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_DOMINOES_CHAINS)) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_DOMINOES_CHAINS)) {
                     for (DominoTile dominoTile : dominoChain) {
                         preparedStatement.setInt(1, chainGeneratedId);
                         preparedStatement.setInt(2, dominoTile.getIndex());
@@ -47,7 +47,14 @@ public class DominoesDaoImpl implements DominoesDao {
 
     @Override
     public List<DominoTileChain> getChainsHistory() {
-        throw new UnsupportedOperationException();
+        Connection connection = ConnectionPool.getConnection();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(SELECT_FROM_DOMINOES_CHAINS);
+            return fromResultSetToDominoTileChainList(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -55,7 +62,7 @@ public class DominoesDaoImpl implements DominoesDao {
         List<DominoTile> dominoTiles = new ArrayList<>();
         Connection connection = ConnectionPool.getConnection();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(GET_ALL_DOMINO_TILES);
+            ResultSet resultSet = statement.executeQuery(SELECT_FROM_DOMINO_TILES);
             while (resultSet.next()) {
                 dominoTiles.add(fromResultSetToDominoTileConverter(resultSet));
             }
@@ -79,5 +86,33 @@ public class DominoesDaoImpl implements DominoesDao {
         int leftValue = resultSet.getInt("left_value");
         int rightValue = resultSet.getInt("right_value");
         return new DominoTile(leftValue, rightValue, index);
+    }
+
+    private List<DominoTileChain> fromResultSetToDominoTileChainList(ResultSet resultSet) throws SQLException {
+        Map<Integer, DominoTileChain> dominoTileChainMap = new LinkedHashMap<>();
+        DominoBox dominoBox = DominoBox.getInstance();
+        while (resultSet.next()) {
+            int dominoId = resultSet.getInt("domino_id");
+            int chainId = resultSet.getInt("chain_id");
+            boolean isSwap = resultSet.getBoolean("swap");
+            if (dominoTileChainMap.containsKey(chainId)) {
+                DominoTileChain dominoTileChain = dominoTileChainMap.get(chainId);
+                dominoTileChain.getChain().add(getDominoTile(dominoId, isSwap, dominoBox));
+            } else {
+                DominoTileChain dominoTileChain = new DominoTileChain();
+                dominoTileChain.getChain().add(getDominoTile(dominoId, isSwap, dominoBox));
+                dominoTileChainMap.put(chainId, dominoTileChain);
+            }
+        }
+        return new LinkedList<>(dominoTileChainMap.values());
+    }
+
+    private DominoTile getDominoTile(int index, boolean swap, DominoBox dominoBox) {
+        DominoTile domino = dominoBox.getByIndex(index);
+        DominoTile newDomino = new DominoTile(domino.getValueLeft(), domino.getValueRight(), index);
+        if (swap) {
+            newDomino.swap();
+        }
+        return newDomino;
     }
 }

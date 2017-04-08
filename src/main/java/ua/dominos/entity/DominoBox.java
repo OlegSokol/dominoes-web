@@ -49,4 +49,13 @@ public class DominoBox {
         Collections.shuffle(copy);
         return copy.subList(0, number);
     }
+
+    public DominoTile getByIndex(int index) {
+        for (DominoTile domino : dominoes) {
+            if (domino.getIndex() == index) {
+                return  domino;
+            }
+        }
+        return null;
+    }
 }

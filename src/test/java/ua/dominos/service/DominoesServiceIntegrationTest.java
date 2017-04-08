@@ -25,4 +25,12 @@ public class DominoesServiceIntegrationTest {
         assertTrue(service.saveChains(dominoTileChainList));
     }
 
+    @Test
+    public void shouldGetChainsHistory() throws DominoesServiceException {
+        List<DominoTileChain> dominoTileChainList = service.getAllChainCombinations(dominoBox.getRandomTiles(4));
+        service.saveChains(dominoTileChainList);
+        List<DominoTileChain> chainsHistory = service.getChainsHistory();
+        assertTrue(chainsHistory.size() > 0);
+    }
+
 }

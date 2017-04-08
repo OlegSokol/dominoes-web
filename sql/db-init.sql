@@ -16,8 +16,7 @@ CREATE TABLE chains (
 CREATE TABLE dominoes_chains (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     chain_id INT NOT NULL,
-    dmono_id INT NOT NULL,
-    position INT NOT NULL,
+    domino_id INT NOT NULL,
     swap BOOLEAN DEFAULT FALSE NOT NULL
 );
 
