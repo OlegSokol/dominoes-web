@@ -1,21 +1,28 @@
 package ua.dominos.service;
 
 import org.junit.Test;
+import ua.dominos.dao.DominoesDao;
+import ua.dominos.dao.impl.DominoesDaoImpl;
+import ua.dominos.dao.transaction.TransactionManager;
 import ua.dominos.entity.DominoBox;
 import ua.dominos.entity.DominoTileChain;
-import ua.dominos.exception.DominoesServiceException;
+import ua.dominos.service.exception.DominoesServiceException;
+import ua.dominos.util.CombinationsUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class DominoesServiceIntegrationTest {
-    private DominoesService service = new DominoesServiceBFS();
+    private TransactionManager transactionManager = new TransactionManager();
+    private DominoesDao dominoesDao = new DominoesDaoImpl();
+    private CombinationsUtil combinationsUtil = new CombinationsUtil();
+    private DominoesService service = new DominoesServiceImpl(transactionManager, dominoesDao, combinationsUtil);
     private DominoBox dominoBox = DominoBox.getInstance();
 
     @Test
     public void shouldGetAllDominoesTile() throws DominoesServiceException {
+        System.out.println("я заранился хуйня какаето");
         assertTrue(service.getAllDominoesTile().size() == 28);
     }
 

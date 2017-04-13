@@ -1,26 +1,18 @@
-package ua.dominos.service;
+package ua.dominos.util;
 
-import ua.dominos.dao.DominoesDao;
-import ua.dominos.dao.impl.DominoesDaoImpl;
-import ua.dominos.dao.transaction.Transaction;
-import ua.dominos.dao.transaction.TransactionManager;
 import ua.dominos.entity.DominoTile;
 import ua.dominos.entity.DominoTileChain;
-import ua.dominos.exception.DominoesServiceException;
 
 import java.util.*;
 
 /**
  * Breadth first search algorithm implementation.
  */
-public class DominoesServiceBFS implements DominoesService {
-    private TransactionManager transactionManager = new TransactionManager();
-    private DominoesDao dominoesDao = new DominoesDaoImpl();
+public class CombinationsUtil {
     private List<DominoTile> dominoes;
     private final Map<Integer, Set<DominoTileChain>> chains = new HashMap<>();
     private final LinkedList<DominoTileChain> allCombinations = new LinkedList<>();
 
-    @Override
     public List<DominoTileChain> getAllChainCombinations(List<DominoTile> dominoes) {
         initChains(dominoes);
         for (Integer chainSize = 1; chainSize <= dominoes.size(); chainSize++) {
@@ -33,30 +25,17 @@ public class DominoesServiceBFS implements DominoesService {
             chains.remove(chainSize - 1);
             chains.put(chainSize + 1, nextChainSet);
         }
-        return this.allCombinations;
+        List<DominoTileChain> combinations = new LinkedList<>();
+        combinations.addAll(this.allCombinations);
+        allCombinations.clear();
+        return combinations;
     }
 
-    @Override
     public DominoTileChain getLongestCombination(List<DominoTile> dominoes) {
         if (allCombinations.isEmpty()) {
             getAllChainCombinations(dominoes);
         }
         return this.allCombinations.getLast();
-    }
-
-    @Override
-    public boolean saveChains(List<DominoTileChain> chains) throws DominoesServiceException {
-        return transactionManager.execute(() -> dominoesDao.saveChains(chains));
-    }
-
-    @Override
-    public List<DominoTileChain> getChainsHistory() throws DominoesServiceException {
-        return transactionManager.executeWithoutTransaction(() -> dominoesDao.getChainsHistory());
-    }
-
-    @Override
-    public List<DominoTile> getAllDominoesTile() throws DominoesServiceException {
-        return transactionManager.executeWithoutTransaction(() -> dominoesDao.getAllDominoesTile());
     }
 
     private Set<DominoTileChain> findNextChains(DominoTileChain currentChain) {

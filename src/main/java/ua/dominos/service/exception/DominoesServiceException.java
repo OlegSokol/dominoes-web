@@ -1,4 +1,4 @@
-package ua.dominos.exception;
+package ua.dominos.service.exception;
 
 public class DominoesServiceException extends Exception {
     private static final String DEFAULT_MSG = "Attempt to user dominoes service was failed";

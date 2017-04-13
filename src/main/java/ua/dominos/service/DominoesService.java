@@ -2,7 +2,7 @@ package ua.dominos.service;
 
 import ua.dominos.entity.DominoTile;
 import ua.dominos.entity.DominoTileChain;
-import ua.dominos.exception.DominoesServiceException;
+import ua.dominos.service.exception.DominoesServiceException;
 
 import java.util.List;
 

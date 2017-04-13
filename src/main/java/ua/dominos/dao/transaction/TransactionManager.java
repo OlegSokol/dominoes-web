@@ -3,7 +3,7 @@ package ua.dominos.dao.transaction;
 import org.apache.log4j.Logger;
 import ua.dominos.dao.ConnectionPool;
 import ua.dominos.dao.DbConnection;
-import ua.dominos.exception.DominoesServiceException;
+import ua.dominos.service.exception.DominoesServiceException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
