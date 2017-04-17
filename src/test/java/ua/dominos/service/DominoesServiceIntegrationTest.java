@@ -22,7 +22,6 @@ public class DominoesServiceIntegrationTest {
 
     @Test
     public void shouldGetAllDominoesTile() throws DominoesServiceException {
-        System.out.println("я заранился хуйня какаето");
         assertTrue(service.getAllDominoesTile().size() == 28);
     }
 

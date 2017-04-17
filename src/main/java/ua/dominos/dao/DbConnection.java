@@ -1,5 +1,7 @@
 package ua.dominos.dao;
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,6 +9,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DbConnection {
+    private static final Logger LOG = Logger.getLogger(DbConnection.class);
+
     private static Connection connection;
     private static String username;
     private static String password;
@@ -20,7 +24,7 @@ public class DbConnection {
             }
             connection = DriverManager.getConnection(connectionURL, username, password);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error(e);
         }
         return connection;
     }
@@ -35,7 +39,7 @@ public class DbConnection {
             password = propertiesFile.getProperty("jdbc.password");
             Class.forName(driver);
         } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
+            LOG.error("Attempt to read from properties file was failed", e);
         }
     }
 }

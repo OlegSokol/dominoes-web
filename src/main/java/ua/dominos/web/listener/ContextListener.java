@@ -11,7 +11,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
- * Just 'spring' context.
+ * Just 'spring' container.
  */
 public class ContextListener implements ServletContextListener {
     @Override

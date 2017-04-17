@@ -3,7 +3,13 @@ package ua.dominos.util;
 import ua.dominos.entity.DominoTile;
 import ua.dominos.entity.DominoTileChain;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.LinkedList;
+import java.util.HashSet;
+
 
 /**
  * Breadth first search algorithm implementation.
@@ -12,6 +18,7 @@ public class CombinationsUtil {
     private List<DominoTile> dominoes;
     private final Map<Integer, Set<DominoTileChain>> chains = new HashMap<>();
     private final LinkedList<DominoTileChain> allCombinations = new LinkedList<>();
+    private DominoTileChain longestCombination;
 
     public List<DominoTileChain> getAllChainCombinations(List<DominoTile> dominoes) {
         initChains(dominoes);
@@ -27,15 +34,17 @@ public class CombinationsUtil {
         }
         List<DominoTileChain> combinations = new LinkedList<>();
         combinations.addAll(this.allCombinations);
+        if (!allCombinations.isEmpty()) {
+            longestCombination = allCombinations.getLast();
+        }
         allCombinations.clear();
         return combinations;
     }
 
     public DominoTileChain getLongestCombination(List<DominoTile> dominoes) {
-        if (allCombinations.isEmpty()) {
-            getAllChainCombinations(dominoes);
-        }
-        return this.allCombinations.getLast();
+        longestCombination = null;
+        getAllChainCombinations(dominoes);
+        return longestCombination;
     }
 
     private Set<DominoTileChain> findNextChains(DominoTileChain currentChain) {

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 
 /**
- * Chains of dominoes. Immutable.
+ * Chains of dominoes.
  */
 public class DominoTileChain {
     private final LinkedList<DominoTile> chain = new LinkedList<>();

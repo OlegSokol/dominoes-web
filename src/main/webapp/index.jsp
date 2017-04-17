@@ -1,15 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Home</title>
 </head>
 <body>
-Number of domino tiles:
-    <form action="combinations" method="post">
-        <label>
+    Generate domino tiles:
+    <div id="generate_dominoes_form">
+        <form id="form" action="combinations" method="post">
             <input type="number" name="numberOfDominoes">
-        </label>
-        <input type="submit" value="Submit">
-    </form>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <a href="combinations">Last combinations</a><br>
+    <a href="history">History</a><br>
 </body>
 </html>

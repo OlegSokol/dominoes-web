@@ -40,7 +40,7 @@ public class DominoBox {
     }
     
     /**
-     * Get list of random dominoe tiles
+     * Get list of random dominoes tiles
      * @param number of random tiles
      *
      */

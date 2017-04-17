@@ -9,9 +9,6 @@ import ua.dominos.util.CombinationsUtil;
 
 import java.util.List;
 
-/**
- * Breadth first search algorithm implementation.
- */
 public class DominoesServiceImpl implements DominoesService {
     private TransactionManager transactionManager;
     private DominoesDao dominoesDao;
