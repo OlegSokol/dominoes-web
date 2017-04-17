@@ -42,7 +42,7 @@ public class CombinationsServlet extends HttpServlet {
             boolean isValid = isValidNumberOfDominoes(numberOfDominoes);
             if (!isValid) {
                 LOG.warn("Number: " + numberOfDominoes + ", is not valid");
-                response.sendError(500, "Wrong number!");
+                response.sendError(400, "Wrong number!");
             }
             DominoBox dominoBox = DominoBox.getInstance();
             List<DominoTile> randomDominoTiles = dominoBox.getRandomTiles(numberOfDominoes);
