@@ -8,7 +8,7 @@
 </p>
 
 ### How to use:<br>
-First of all you have to insert your database properties to <code>pom.xml</code> and <code>database.properties</code>
+First of all insert database properties to <code>pom.xml</code> and <code>database.properties</code>
 
 Launch <code>start.bat</code>
 
