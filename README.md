@@ -11,6 +11,11 @@
 First of all insert database properties to <code>pom.xml</code> and <code>database.properties</code>
 
 Launch <code>start.bat</code>
+or execute sql script and start jetty:<br>
+<code>
+  mvn sql:execute
+</code><br>
+<code>mvn jetty:run</code>
 
 Open your web browser to:
 
